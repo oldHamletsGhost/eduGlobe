@@ -6,7 +6,7 @@
 <meta name="description" content="3D globe created using three.js"/>
 <meta name="author" content="Greg Goldsberry"/>
 <meta name="references" content="Mr. Droob & Team, creators of three.js"/>
-<meta content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+<meta content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" name="viewport"/>
 
 <title>Globe Query</title>
 
@@ -22,12 +22,11 @@
 </head>
 
 <body>
-	<!-- <button id="checkCoords">click</button>  
-	<button id="rotate">rotate!</button>-->
 	<div id="atlas"></div>
 </body>
 
 <script>
+
 var atlas, camera, scene, renderer;
 var globe;
 var mouseX = 0, mouseY=0;
@@ -44,7 +43,6 @@ var mouseXOnMouseDown = 0, mouseYOnMouseDown = 0;
 var radius = 150;
 
 var rotate = true;
-var temp = 0;
 
 init();
 animate();
@@ -66,26 +64,16 @@ animate();
 		{
 			var geometry = new THREE.SphereGeometry(radius, 40, 40);
 			var material = new THREE.MeshLambertMaterial({
-				map: texture,
+				map: texture
 				//overdraw: true
-				wireframe: true
+				//wireframe: true
 			});
 		
 			var mesh = new THREE.Mesh(geometry, material);
 			globe.add(mesh);
+			globe.add(addOthers(globe));
 		
 		});
-
-		var ambientLight = new THREE.AmbientLight(0xffffff);
-		scene.add(ambientLight);
-		
-		var directionalLight = new THREE.DirectionalLight(0xffffff);
-		directionalLight.position.set(1,1,1).normalize();
-		scene.add(directionalLight);
-		
-		var canvas = document.createElement('canvas');
-		canvas.width = 128;
-		canvas.height = 128;
 		
 		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
 		renderer = new THREE.CanvasRenderer();
@@ -97,7 +85,8 @@ animate();
 		document.addEventListener('mousewheel', onMouseWheel, false);
 		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
 		window.addEventListener('resize', onWindowResize, false );
-	}
+	}	
+	
 
 	function onWindowResize(){
 
@@ -118,6 +107,7 @@ animate();
 			globe.rotation.y += (targetRotationForX - globe.rotation.y) *0.05;
 		}
 		renderer.render(scene, camera);
+		//animate();
 	}		
 	
 	function animate(){
@@ -128,8 +118,32 @@ animate();
 	/***** MOUSE EVENTS START******/	
 	function onDocumentMouseDown(event){
 		
+		
+		
 		rotate = false;
 		event.preventDefault();
+
+		
+		mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
+		mouse.y = -(event.clientY/window.innerHeight) * 2 + 1;
+
+		//var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+		var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
+		projector.unprojectVector(vector, camera);
+		
+		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
+		var intersects = raycaster.intersectObjects(scene.children);
+
+		//DETECTS IF THE SPHERE IS TOUCHED
+		if (intersects.length > 0) {
+			("sphere touched");		
+		}else{
+			
+			//alert("space touched");
+		}	
+		
+		
+		
 		
 		document.addEventListener('mousemove', onDocumentMouseMove, false);
 		document.addEventListener('mouseup', onDocumentMouseUp, false);
@@ -196,9 +210,8 @@ animate();
 		}
 	}
 	
-	function onDocumentTouchMove( event ) {
-		
-		rotate = false;
+	function onDocumentTouchMove( event ) {	
+		//Rotate = false;
 		if ( event.touches.length == 1 ){	
 			event.preventDefault();
 			mouseX = event.touches[ 0 ].pageX - windowHalfX;
@@ -231,7 +244,53 @@ animate();
 	}
 	/**** TOUCH EVENTS END *****/
 
+	function addOthers(globe){
+	
+		var rectLength = 120, rectWidth = 40;
+		var rectShape = new THREE.Shape();
+		rectShape.moveTo( 0,0 );
+		rectShape.lineTo( 0, rectWidth );
+		rectShape.lineTo( rectLength, rectWidth );
+		rectShape.lineTo( rectLength, 0 );
+		rectShape.lineTo( 0, 0 );
+	
+		var geometry = rectShape.createPointsGeometry();
+		var material = new THREE.LineBasicMaterial({
+			linewidth: 10, color: 0xFFFFFF
+		});
+		
+		var addMesh = new THREE.Mesh(geometry, material);	
+		//addMesh.position.set(globe.position.x, globe.position.y, 0);
+		//addMesh.rotation.set(0, 0, 0);
+		//addMesh.scale.set( 1, 1, 1 );
+		//rotation
+		var line = new THREE.Line(geometry, material);
+		//line.position.set(globe.position.x, globe.position.y, 0);
+		line.position.set(6,30,70);
+		line.rotation.set(-180, -1, -80);
+		line.scale.set( 1, 1, 10 );
+		
+		return line;
+	
+	}
+	
+	// CODE SCRAPS
+
+	//NOTE: ambient light doesn't work with canvas
+	//var ambientLight = new THREE.AmbientLight(0xffffff);
+	//scene.add(ambientLight);
+	
+	//var directionalLight = new THREE.DirectionalLight(0xffffff);
+	//directionalLight.position.set(1,1,1).normalize();
+	//scene.add(directionalLight);
+	/*
+	var canvas = document.createElement('canvas');
+	canvas.id = "canvas";
+	canvas.width = 128;
+	canvas.height = 128;
+	*/
 </script>
+
 
 
 </html>
