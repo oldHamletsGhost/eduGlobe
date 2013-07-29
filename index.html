@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+<meta http-equiv="Content-Type" content="text/html" charset="UTF-8" />
+<meta name="description" content="3D globe created using three.js"/>
+<meta name="author" content="Greg Goldsberry"/>
+<meta name="references" content="Mr. Droob & Team, creators of three.js"/>
+<meta content="width=device-width; initial-scale=1; maximum-scale=1.0; user-scalable=0;" name="viewport"/>
+
+<title>Globe Query</title>
+
+<script src="jquery1.7.2.min.js" type="text/javascript"></script>
+<script src="jquery1.8.3.min.js" type="text/javascript"></script>
+<script src="jgestures.js" type="text/javascript"></script>
+<script src="three.js" type="text/javascript"></script>
+
+<style>
+	body{ background-image:url(starField.jpg);}
+</style>
+
+</head>
+
+<body>
+	<!-- <button id="checkCoords">click</button>  
+	<button id="rotate">rotate!</button>-->
+	<div id="atlas"></div>
+</body>
+
+<script>
+var atlas, camera, scene, renderer;
+var globe;
+var mouseX = 0, mouseY=0;
+
+var windowHalfX = window.innerWidth/2;
+var windowHalfY = window.innerHeight/2;
+
+var mouse = new THREE.Vector2();
+var projector = new THREE.Projector();
+
+var targetRotationForX = 0, targetRotationForY =0;
+var targetRotationOnMouseDownForX = 0, targetRotationOnMouseDownForY = 0, targetRotationOnMouseDown=0;
+var mouseXOnMouseDown = 0, mouseYOnMouseDown = 0;
+var radius = 150;
+
+var rotate = true;
+var temp = 0;
+
+init();
+animate();
+
+	function init(){
+	
+		atlas = document.getElementById('atlas');		
+		scene = new THREE.Scene();
+		
+		camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
+		camera.position.z = 500;
+		
+		globe = new THREE.Object3D();
+		scene.add(globe);
+		
+		var loader = new THREE.TextureLoader();
+		
+		loader.load('smallEarth.jpg', function (texture)
+		{
+			var geometry = new THREE.SphereGeometry(radius, 40, 40);
+			var material = new THREE.MeshLambertMaterial({
+				map: texture,
+				//overdraw: true
+				wireframe: true
+			});
+		
+			var mesh = new THREE.Mesh(geometry, material);
+			globe.add(mesh);
+		
+		});
+
+		var ambientLight = new THREE.AmbientLight(0xffffff);
+		scene.add(ambientLight);
+		
+		var directionalLight = new THREE.DirectionalLight(0xffffff);
+		directionalLight.position.set(1,1,1).normalize();
+		scene.add(directionalLight);
+		
+		var canvas = document.createElement('canvas');
+		canvas.width = 128;
+		canvas.height = 128;
+		
+		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
+		renderer = new THREE.CanvasRenderer();
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		atlas.appendChild(renderer.domElement);
+
+		document.addEventListener('mousedown', onDocumentMouseDown, false);		
+		document.addEventListener('touchstart', onDocumentTouchStart, false);
+		document.addEventListener('mousewheel', onMouseWheel, false);
+		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
+		window.addEventListener('resize', onWindowResize, false );
+	}
+
+	function onWindowResize(){
+
+		windowHalfX = window.innerWidth / 2;
+		windowHalfY = window.innerHeight / 2;
+
+		camera.aspect = window.innerWidth / window.innerHeight;
+		camera.updateProjectionMatrix();
+
+		renderer.setSize( window.innerWidth, window.innerHeight );
+	}
+	
+	function render(){	
+		if (rotate == true){
+			//globe.rotation.x += 0.01;//upon load, keeps the globe turning continuously	
+		}else{
+			globe.rotation.x += (targetRotationForY - globe.rotation.x) *0.05;
+			globe.rotation.y += (targetRotationForX - globe.rotation.y) *0.05;
+		}
+		renderer.render(scene, camera);
+	}		
+	
+	function animate(){
+		requestAnimationFrame(animate);
+		render();
+	}
+		
+	/***** MOUSE EVENTS START******/	
+	function onDocumentMouseDown(event){
+		
+		rotate = false;
+		event.preventDefault();
+		
+		document.addEventListener('mousemove', onDocumentMouseMove, false);
+		document.addEventListener('mouseup', onDocumentMouseUp, false);
+		document.addEventListener('mouseout', onDocumentMouseOut, false);
+
+		mouseXOnMouseDown = event.clientX - windowHalfX;
+		mouseYOnMouseDown = event.clientY - windowHalfY;
+
+		targetRotationOnMouseDownForX = targetRotationForX;
+		targetRotationOnMouseDownForY = targetRotationForY;
+	}
+	
+	function onDocumentMouseMove(e){
+		mouseX =  e.clientX - windowHalfX;
+		mouseY =  e.clientY - windowHalfY;	
+
+		targetRotationForX = targetRotationOnMouseDownForX + (mouseX - mouseXOnMouseDown) * 0.02;
+		targetRotationForY = targetRotationOnMouseDownForY + (mouseY - mouseYOnMouseDown) * 0.02;	
+	}	
+	
+	function onDocumentMouseUp(){removeEventListeners();}
+	function onDocumentMouseOut(){removeEventListeners();}
+	
+	function onMouseWheel(event){
+		event.preventDefault();
+		
+		var e = window.event || event;		
+		var delta = Math.max(-1, Math.min(1, (event.wheelDelta || e.detail)));
+		
+		if (delta == 1){
+			if(globe.position.z > -510){globe.position.z -= 10;}
+		}else{
+			if (globe.position.z < 120){globe.position.z += 10;}
+		}
+	}
+	
+	function removeEventListeners(){
+		document.removeEventListener('mousemove', onDocumentMouseMove, false);
+		document.removeEventListener('mouseup', onDocumentMouseUp, false);
+		document.removeEventListener('mouseout', onDocumentMouseOut, false);	
+	}
+	
+	//$("#rotate").click(function (){rotate = rotate==true? false:true;});
+	/****** MOUSE EVENTS END **********/
+	
+	/****** TOUCH EVENETS START *******/
+	function onDocumentTouchStart( event ) {
+		
+		rotate = false;
+		document.addEventListener('touchmove', onDocumentTouchMove, false);
+		document.addEventListener('touchleave', onDocumentTouchLeave, false);
+		document.addEventListener('touchend', onDocumentTouchEnd, false);
+		$("#atlas").bind("pinchopen", onPinchOpen);
+		$("#atlas").bind("pinchclose", onPinchClose);
+		//$("#atlas").bind("swipeleft", onSwipeLeft);
+		//$("#atlas").bind("swiperight", onSwipeRight);
+		
+		if ( event.touches.length == 1 ){	
+			event.preventDefault();
+			mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
+			mouseYOnMouseDown = event.touches[ 0 ].pageY - windowHalfY;
+			targetRotationOnMouseDownForX = targetRotationForX;
+			targetRotationOnMouseDownForY = targetRotationForY;
+		}
+	}
+	
+	function onDocumentTouchMove( event ) {
+		
+		rotate = false;
+		if ( event.touches.length == 1 ){	
+			event.preventDefault();
+			mouseX = event.touches[ 0 ].pageX - windowHalfX;
+			mouseY = event.touches[ 0 ].pageY - windowHalfY;
+			targetRotationForX = targetRotationOnMouseDownForX + ( mouseX - mouseXOnMouseDown ) * 0.005;
+			targetRotationForY = targetRotationOnMouseDownForY + ( mouseY - mouseYOnMouseDown ) * 0.005;
+		}	
+	}
+	
+	function onDocumentTouchLeave(event){
+		document.removeEventListener('touchmove', onDocumentTouchMove, false);
+		document.removeEventListener('touchleave', onDocumentTouchLeave, false);
+		document.removeEventListener('touchend', onDocumentTouchEnd, false);
+	}	
+	
+	function onDocumentTouchEnd(event){
+		document.removeEventListener('touchmove', onDocumentTouchMove, false);
+		document.removeEventListener('touchleave', onDocumentTouchLeave, false);
+		document.removeEventListener('touchend', onDocumentTouchEnd, false);
+	}	
+	
+	function onPinchOpen(event){
+		event.preventDefault();
+		if(globe.position.z > -540){globe.position.z -= 1;}
+	}	
+	
+	function onPinchClose(event){
+		event.preventDefault();
+		if (globe.position.z < 330){globe.position.z += 1;}
+	}
+	/**** TOUCH EVENTS END *****/
+
+</script>
+
+
+</html>
