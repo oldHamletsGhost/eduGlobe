@@ -27,7 +27,7 @@
 
 <script>
 
-var atlas, camera, scene, renderer;
+var atlas, camera, scene, renderer, light;
 var globe;
 var mouseX = 0, mouseY=0;
 
@@ -64,18 +64,23 @@ init();
 		{
 			var geometry = new THREE.SphereGeometry(radius, 40, 40);
 			var material = new THREE.MeshLambertMaterial({
-				map: texture
-				//overdraw: true
+				map: texture,
+				overdraw: true
 				//wireframe: true
 			});
 		
 			var mesh = new THREE.Mesh(geometry, material);
 			globe.add(mesh);
-			//globe.add(addOthers(globe));
-		
+			//globe.add(addOthers(globe));		
 		});
 		
 		scene.add(globe);
+		
+		
+			// LIGHT
+	light = new THREE.PointLight(0xffffff);
+	light.position.set(0,0,0);
+	scene.add(light);
 		
 		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
 		renderer = new THREE.CanvasRenderer();
