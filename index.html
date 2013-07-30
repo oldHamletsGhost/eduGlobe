@@ -45,8 +45,7 @@ var radius = 150;
 var rotate = true;
 
 init();
-animate();
-
+//animate();
 	function init(){
 	
 		atlas = document.getElementById('atlas');		
@@ -54,9 +53,10 @@ animate();
 		
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
 		camera.position.z = 500;
+		//scene.add(camera);
 		
 		globe = new THREE.Object3D();
-		scene.add(globe);
+		globe.name = "earth"
 		
 		var loader = new THREE.TextureLoader();
 		
@@ -71,9 +71,11 @@ animate();
 		
 			var mesh = new THREE.Mesh(geometry, material);
 			globe.add(mesh);
-			globe.add(addOthers(globe));
+			//globe.add(addOthers(globe));
 		
 		});
+		
+		scene.add(globe);
 		
 		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
 		renderer = new THREE.CanvasRenderer();
@@ -85,6 +87,9 @@ animate();
 		document.addEventListener('mousewheel', onMouseWheel, false);
 		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
 		window.addEventListener('resize', onWindowResize, false );
+		
+		//renderer.render(scene, camera);
+		requestAnimationFrame(render);
 	}	
 	
 
@@ -99,52 +104,55 @@ animate();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 	}
 	
-	function render(){	
-		if (rotate == true){
-			//globe.rotation.x += 0.01;//upon load, keeps the globe turning continuously	
-		}else{
+	function render(){
+			
+		requestAnimationFrame(render);
+	/*	if (rotate == true){
+			//globe.rotation.x += 0.01;
+		}else{ */
 			globe.rotation.x += (targetRotationForY - globe.rotation.x) *0.05;
 			globe.rotation.y += (targetRotationForX - globe.rotation.y) *0.05;
-		}
+	//	}
 		renderer.render(scene, camera);
-		//animate();
 	}		
-	
+/*	
 	function animate(){
 		requestAnimationFrame(animate);
 		render();
 	}
-		
+	*/	
 	/***** MOUSE EVENTS START******/	
 	function onDocumentMouseDown(event){
-		
-		
-		
+
 		rotate = false;
 		event.preventDefault();
-
 		
 		mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY/window.innerHeight) * 2 + 1;
 
-		//var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
+		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+		//var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
 		projector.unprojectVector(vector, camera);
 		
 		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
-		var intersects = raycaster.intersectObjects(scene.children);
+		/*descendents = [];
+		descendents = scene.getDescendants();
+		
+		for (i=0; i<descendents.length; i++){
+				console.log(descendents[i]);
+			}
+		*/
+		var intersects = raycaster.intersectObjects(scene.getDescendants());
+		console.log(intersects.length);
 
 		//DETECTS IF THE SPHERE IS TOUCHED
 		if (intersects.length > 0) {
-			("sphere touched");		
+			//alert("sphere touched");		
 		}else{
 			
-			//alert("space touched");
+		//	alert("space touched");
 		}	
-		
-		
-		
-		
+
 		document.addEventListener('mousemove', onDocumentMouseMove, false);
 		document.addEventListener('mouseup', onDocumentMouseUp, false);
 		document.addEventListener('mouseout', onDocumentMouseOut, false);
@@ -198,8 +206,6 @@ animate();
 		document.addEventListener('touchend', onDocumentTouchEnd, false);
 		$("#atlas").bind("pinchopen", onPinchOpen);
 		$("#atlas").bind("pinchclose", onPinchClose);
-		//$("#atlas").bind("swipeleft", onSwipeLeft);
-		//$("#atlas").bind("swiperight", onSwipeRight);
 		
 		if ( event.touches.length == 1 ){	
 			event.preventDefault();
@@ -211,7 +217,6 @@ animate();
 	}
 	
 	function onDocumentTouchMove( event ) {	
-		//Rotate = false;
 		if ( event.touches.length == 1 ){	
 			event.preventDefault();
 			mouseX = event.touches[ 0 ].pageX - windowHalfX;
@@ -260,9 +265,9 @@ animate();
 		});
 		
 		var addMesh = new THREE.Mesh(geometry, material);	
-		//addMesh.position.set(globe.position.x, globe.position.y, 0);
-		//addMesh.rotation.set(0, 0, 0);
-		//addMesh.scale.set( 1, 1, 1 );
+		addMesh.position.set(globe.position.x, globe.position.y, 0);
+		addMesh.rotation.set(0, 0, 0);
+		addMesh.scale.set( 1, 1, 1 );
 		//rotation
 		var line = new THREE.Line(geometry, material);
 		//line.position.set(globe.position.x, globe.position.y, 0);
