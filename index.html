@@ -7,6 +7,7 @@
 <meta name="author" content="Greg Goldsberry"/>
 <meta name="references" content="Mr. Droob & Team, creators of three.js"/>
 <meta content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" name="viewport"/>
+<meta name="viewpoint" content="width=device-width, height=device-height"/>
 
 <title>Globe Query</title>
 
@@ -16,7 +17,13 @@
 <script src="three.js" type="text/javascript"></script>
 
 <style>
-	body{ background-image:url(starField.jpg);}
+	body{ 
+		background:url(starField.jpg) no-repeat center center fixed;
+		-webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+        background-size: cover;
+		}
 </style>
 
 </head>
@@ -47,6 +54,12 @@ var rotate = true;
 init();
 //animate();
 	function init(){
+	
+		alert("Height: "+($(window).height())+", Width: "+($(window).width()));
+	
+		//hide scroll bars
+		document.documentElement.style.overflow = 'hidden';
+		document.body.scroll = "no";
 	
 		atlas = document.getElementById('atlas');		
 		scene = new THREE.Scene();
@@ -135,8 +148,8 @@ init();
 		mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY/window.innerHeight) * 2 + 1;
 
-		var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
-		//var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
+		//var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
+		var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
 		projector.unprojectVector(vector, camera);
 		
 		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
@@ -173,8 +186,8 @@ init();
 		mouseX =  e.clientX - windowHalfX;
 		mouseY =  e.clientY - windowHalfY;	
 
-		targetRotationForX = targetRotationOnMouseDownForX + (mouseX - mouseXOnMouseDown) * 0.02;
-		targetRotationForY = targetRotationOnMouseDownForY + (mouseY - mouseYOnMouseDown) * 0.02;	
+		targetRotationForX = targetRotationOnMouseDownForX + (mouseX - mouseXOnMouseDown) * 0.05;
+		targetRotationForY = targetRotationOnMouseDownForY + (mouseY - mouseYOnMouseDown) * 0.05;	
 	}	
 	
 	function onDocumentMouseUp(){removeEventListeners();}
@@ -254,7 +267,24 @@ init();
 	}
 	/**** TOUCH EVENTS END *****/
 
-	function addOthers(globe){
+
+	
+	// CODE SCRAPS
+
+	//NOTE: ambient light doesn't work with canvas
+	//var ambientLight = new THREE.AmbientLight(0xffffff);
+	//scene.add(ambientLight);
+	
+	//var directionalLight = new THREE.DirectionalLight(0xffffff);
+	//directionalLight.position.set(1,1,1).normalize();
+	//scene.add(directionalLight);
+	/*
+	var canvas = document.createElement('canvas');
+	canvas.id = "canvas";
+	canvas.width = 128;
+	canvas.height = 128;
+	
+		function addOthers(globe){
 	
 		var rectLength = 120, rectWidth = 40;
 		var rectShape = new THREE.Shape();
@@ -284,20 +314,8 @@ init();
 	
 	}
 	
-	// CODE SCRAPS
-
-	//NOTE: ambient light doesn't work with canvas
-	//var ambientLight = new THREE.AmbientLight(0xffffff);
-	//scene.add(ambientLight);
 	
-	//var directionalLight = new THREE.DirectionalLight(0xffffff);
-	//directionalLight.position.set(1,1,1).normalize();
-	//scene.add(directionalLight);
-	/*
-	var canvas = document.createElement('canvas');
-	canvas.id = "canvas";
-	canvas.width = 128;
-	canvas.height = 128;
+	
 	*/
 </script>
 
