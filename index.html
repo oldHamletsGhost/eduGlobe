@@ -6,8 +6,9 @@
 <meta name="description" content="3D globe created using three.js"/>
 <meta name="author" content="Greg Goldsberry"/>
 <meta name="references" content="Mr. Droob & Team, creators of three.js"/>
-<meta content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=0" name="viewport"/>
-<meta name="viewpoint" content="width=device-width, height=device-height"/>
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+
+<!-- <meta name="viewpoint" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/> -->
 
 <title>Globe Query</title>
 
@@ -55,7 +56,9 @@ init();
 //animate();
 	function init(){
 	
-		alert("Height: "+($(window).height())+", Width: "+($(window).width()));
+		//alert(window.screen.height);
+		console.log("Device height: "+window.screen.height+", Device width: "+window.screen.width);
+		console.log("scrollHeight: "+document.body.scrollHeight+" scrollWidth: "+document.body.scrollWidth);
 	
 		//hide scroll bars
 		document.documentElement.style.overflow = 'hidden';
@@ -75,7 +78,7 @@ init();
 		
 		loader.load('smallEarth.jpg', function (texture)
 		{
-			var geometry = new THREE.SphereGeometry(radius, 40, 40);
+			var geometry = new THREE.SphereGeometry(radius, 50, 50);
 			var material = new THREE.MeshLambertMaterial({
 				map: texture,
 				overdraw: true
@@ -90,10 +93,10 @@ init();
 		scene.add(globe);
 		
 		
-			// LIGHT
-	light = new THREE.PointLight(0xffffff);
-	light.position.set(0,0,0);
-	scene.add(light);
+		// LIGHT
+		light = new THREE.PointLight(0xffffff);
+		light.position.set(0,0,0);
+		scene.add(light);
 		
 		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
 		renderer = new THREE.CanvasRenderer();
@@ -153,15 +156,9 @@ init();
 		projector.unprojectVector(vector, camera);
 		
 		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
-		/*descendents = [];
-		descendents = scene.getDescendants();
-		
-		for (i=0; i<descendents.length; i++){
-				console.log(descendents[i]);
-			}
-		*/
 		var intersects = raycaster.intersectObjects(scene.getDescendants());
-		console.log(intersects.length);
+		
+		//console.log(intersects.length);
 
 		//DETECTS IF THE SPHERE IS TOUCHED
 		if (intersects.length > 0) {
