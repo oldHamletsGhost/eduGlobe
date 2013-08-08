@@ -19,17 +19,24 @@
 
 <style>
 	body{ 
-		background:url(starField.jpg) no-repeat center center fixed;
+		background-image:url(starField.jpg);
+        background-size: cover;
+		background-position: top center;
+		background-repeat: no-repeat;
 		-webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
-        background-size: cover;
 		}
+
+		
+
+	
 </style>
 
 </head>
 
 <body>
+
 	<div id="atlas"></div>
 </body>
 
@@ -236,8 +243,8 @@ init();
 			event.preventDefault();
 			mouseX = event.touches[ 0 ].pageX - windowHalfX;
 			mouseY = event.touches[ 0 ].pageY - windowHalfY;
-			targetRotationForX = targetRotationOnMouseDownForX + ( mouseX - mouseXOnMouseDown ) * 0.005;
-			targetRotationForY = targetRotationOnMouseDownForY + ( mouseY - mouseYOnMouseDown ) * 0.005;
+			targetRotationForX = targetRotationOnMouseDownForX + ( mouseX - mouseXOnMouseDown ) * 0.05;
+			targetRotationForY = targetRotationOnMouseDownForY + ( mouseY - mouseYOnMouseDown ) * 0.05;
 		}	
 	}
 	
