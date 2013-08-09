@@ -20,15 +20,18 @@
 <style>
 	body{ 
 		background-image:url(starField.jpg);
-        background-size: cover;
-		background-position: top center;
+		/*background-position: center;*/
 		background-repeat: no-repeat;
+		background-size: cover;
+    /*    
+		
+		
 		-webkit-background-size: cover;
         -moz-background-size: cover;
-        -o-background-size: cover;
+        -o-background-size: cover;*/	
 		}
 
-		
+	
 
 	
 </style>
@@ -120,6 +123,14 @@ init();
 		requestAnimationFrame(render);
 	}	
 	
+	$(document).ready(function(){
+			var width =  $(window).width();
+			var height = $(window).height();
+			
+			$('body.img').css("width", "100%").css("height","100%");
+		
+	
+	});
 
 	function onWindowResize(){
 
@@ -130,6 +141,8 @@ init();
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		//$('body').css("background-size", document.body.scrollHeight, document.body.scrollWidth);
+		$('body.img').css("width", "100%").css("height","100%");
 	}
 	
 	function render(){
@@ -215,8 +228,6 @@ init();
 		document.removeEventListener('mouseup', onDocumentMouseUp, false);
 		document.removeEventListener('mouseout', onDocumentMouseOut, false);	
 	}
-	
-	//$("#rotate").click(function (){rotate = rotate==true? false:true;});
 	/****** MOUSE EVENTS END **********/
 	
 	/****** TOUCH EVENETS START *******/
@@ -269,6 +280,7 @@ init();
 		event.preventDefault();
 		if (globe.position.z < 330){globe.position.z += 1;}
 	}
+	
 	/**** TOUCH EVENTS END *****/
 
 
