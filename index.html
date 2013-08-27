@@ -20,29 +20,22 @@
 <style>
 	body{ 
 		background-image:url(starField.jpg);
-		/*background-position: center;*/
-		background-repeat: no-repeat;
-		background-size: cover;
-    /*    
-		
-		
+		background-position: center;
+		/*background-size: cover;
 		-webkit-background-size: cover;
         -moz-background-size: cover;
-        -o-background-size: cover;*/	
-		}
+        -o-background-size: cover;
+		background-repeat: no-repeat;
+		
 
-	
-
-	
+		*/
+	}
+		
 </style>
-
 </head>
-
 <body>
-
 	<div id="atlas"></div>
 </body>
-
 <script>
 
 var atlas, camera, scene, renderer, light;
@@ -59,36 +52,39 @@ var targetRotationForX = 0, targetRotationForY =0;
 var targetRotationOnMouseDownForX = 0, targetRotationOnMouseDownForY = 0, targetRotationOnMouseDown=0;
 var mouseXOnMouseDown = 0, mouseYOnMouseDown = 0;
 var radius = 150;
-
-var rotate = true;
+var deviceWidth;
 
 init();
 //animate();
 	function init(){
+
+		//console.log("Device height: "+deviceHeight+", Device width: "+deviceWidth);
+		//console.log("scrollHeight: "+document.body.scrollHeight+" scrollWidth: "+document.body.scrollWidth);
 	
-		//alert(window.screen.height);
-		console.log("Device height: "+window.screen.height+", Device width: "+window.screen.width);
-		console.log("scrollHeight: "+document.body.scrollHeight+" scrollWidth: "+document.body.scrollWidth);
-	
-		//hide scroll bars
-		document.documentElement.style.overflow = 'hidden';
-		document.body.scroll = "no";
+		//hide scroll bars	
+		//document.documentElement.style.overflow = 'hidden';
+		//document.body.scroll = "no";
 	
 		atlas = document.getElementById('atlas');		
 		scene = new THREE.Scene();
 		
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
-		camera.position.z = 500;
-		//scene.add(camera);
+		
+		setZ();
+		
+		
+		
+		
+		scene.add(camera);
 		
 		globe = new THREE.Object3D();
-		globe.name = "earth"
+		//globe.name = "earth"
 		
 		var loader = new THREE.TextureLoader();
 		
 		loader.load('smallEarth.jpg', function (texture)
 		{
-			var geometry = new THREE.SphereGeometry(radius, 50, 50);
+			var geometry = new THREE.SphereGeometry(radius, 40, 40);
 			var material = new THREE.MeshLambertMaterial({
 				map: texture,
 				overdraw: true
@@ -119,19 +115,12 @@ init();
 		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
 		window.addEventListener('resize', onWindowResize, false );
 		
-		//renderer.render(scene, camera);
+		var canvas = document.getElementsByTagName('canvas')[0];
+		canvas.width = $("#atlas").width();
+
 		requestAnimationFrame(render);
 	}	
 	
-	$(document).ready(function(){
-			var width =  $(window).width();
-			var height = $(window).height();
-			
-			$('body.img').css("width", "100%").css("height","100%");
-		
-	
-	});
-
 	function onWindowResize(){
 
 		windowHalfX = window.innerWidth / 2;
@@ -141,8 +130,7 @@ init();
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
-		//$('body').css("background-size", document.body.scrollHeight, document.body.scrollWidth);
-		$('body.img').css("width", "100%").css("height","100%");
+		setZ();
 	}
 	
 	function render(){
@@ -156,29 +144,20 @@ init();
 	//	}
 		renderer.render(scene, camera);
 	}		
-/*	
-	function animate(){
-		requestAnimationFrame(animate);
-		render();
-	}
-	*/	
+	
 	/***** MOUSE EVENTS START******/	
 	function onDocumentMouseDown(event){
 
-		rotate = false;
 		event.preventDefault();
 		
 		mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY/window.innerHeight) * 2 + 1;
 
-		//var vector = new THREE.Vector3(mouse.x, mouse.y, 0.5);
 		var vector = new THREE.Vector3(mouse.x, mouse.y, camera.near);
 		projector.unprojectVector(vector, camera);
 		
 		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
 		var intersects = raycaster.intersectObjects(scene.getDescendants());
-		
-		//console.log(intersects.length);
 
 		//DETECTS IF THE SPHERE IS TOUCHED
 		if (intersects.length > 0) {
@@ -232,8 +211,7 @@ init();
 	
 	/****** TOUCH EVENETS START *******/
 	function onDocumentTouchStart( event ) {
-		
-		rotate = false;
+	
 		document.addEventListener('touchmove', onDocumentTouchMove, false);
 		document.addEventListener('touchleave', onDocumentTouchLeave, false);
 		document.addEventListener('touchend', onDocumentTouchEnd, false);
@@ -283,7 +261,15 @@ init();
 	
 	/**** TOUCH EVENTS END *****/
 
-
+	//Others methods
+	function setZ(){
+	deviceWidth= $(window).width();
+		if (deviceWidth < 470)
+			camera.position.z = 800;
+		else
+			camera.position.z = 500;
+	
+	}
 	
 	// CODE SCRAPS
 
@@ -325,16 +311,8 @@ init();
 		line.position.set(6,30,70);
 		line.rotation.set(-180, -1, -80);
 		line.scale.set( 1, 1, 10 );
-		
 		return line;
-	
 	}
-	
-	
-	
 	*/
 </script>
-
-
-
 </html>
