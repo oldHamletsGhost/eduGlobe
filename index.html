@@ -16,19 +16,18 @@
 <script src="jquery1.8.3.min.js" type="text/javascript"></script>
 <script src="jgestures.js" type="text/javascript"></script>
 <script src="three.js" type="text/javascript"></script>
+<script src="hammer.js" type="text/javascript"></script>
+<script src="hammer.fakemultitouch.js" type="text/javascript"></script>
 
 <style>
 	body{ 
 		background-image:url(starField.jpg);
 		background-position: center;
-		/*background-size: cover;
+		background-size: cover;
 		-webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
-		background-repeat: no-repeat;
-		
-
-		*/
+		background-repeat: no-repeat;	
 	}
 		
 </style>
@@ -53,17 +52,21 @@ var targetRotationOnMouseDownForX = 0, targetRotationOnMouseDownForY = 0, target
 var mouseXOnMouseDown = 0, mouseYOnMouseDown = 0;
 var radius = 150;
 var deviceWidth;
+var deviceHeight;
 
 init();
-//animate();
+
 	function init(){
 
-		//console.log("Device height: "+deviceHeight+", Device width: "+deviceWidth);
+		x = $(window).width();
+		y = $(window).height();
+		
+		//console.log("Device height: "+y+", Device width: "+x);
 		//console.log("scrollHeight: "+document.body.scrollHeight+" scrollWidth: "+document.body.scrollWidth);
 	
 		//hide scroll bars	
-		//document.documentElement.style.overflow = 'hidden';
-		//document.body.scroll = "no";
+		document.documentElement.style.overflow = 'hidden';
+		document.body.scroll = "no";
 	
 		atlas = document.getElementById('atlas');		
 		scene = new THREE.Scene();
@@ -71,15 +74,9 @@ init();
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
 		
 		setZ();
-		
-		
-		
-		
 		scene.add(camera);
 		
 		globe = new THREE.Object3D();
-		//globe.name = "earth"
-		
 		var loader = new THREE.TextureLoader();
 		
 		loader.load('smallEarth.jpg', function (texture)
@@ -100,9 +97,11 @@ init();
 		
 		
 		// LIGHT
+		/*
 		light = new THREE.PointLight(0xffffff);
 		light.position.set(0,0,0);
 		scene.add(light);
+		*/
 		
 		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
 		renderer = new THREE.CanvasRenderer();
@@ -116,7 +115,13 @@ init();
 		window.addEventListener('resize', onWindowResize, false );
 		
 		var canvas = document.getElementsByTagName('canvas')[0];
+		
+		here = $("#atlas").width();
+		
+		console.log("THIS ONE: "+here);
+		
 		canvas.width = $("#atlas").width();
+		//canvas.height = window.innerHeight;
 
 		requestAnimationFrame(render);
 	}	
@@ -130,7 +135,10 @@ init();
 		camera.updateProjectionMatrix();
 
 		renderer.setSize( window.innerWidth, window.innerHeight );
+		
 		setZ();
+		canvas.width = $("#atlas").width();
+		canvas.height = $("#atlas").height();
 	}
 	
 	function render(){
@@ -164,7 +172,7 @@ init();
 			//alert("sphere touched");		
 		}else{
 			
-		//	alert("space touched");
+			//alert("space touched");
 		}	
 
 		document.addEventListener('mousemove', onDocumentMouseMove, false);
@@ -181,7 +189,7 @@ init();
 	function onDocumentMouseMove(e){
 		mouseX =  e.clientX - windowHalfX;
 		mouseY =  e.clientY - windowHalfY;	
-
+		
 		targetRotationForX = targetRotationOnMouseDownForX + (mouseX - mouseXOnMouseDown) * 0.05;
 		targetRotationForY = targetRotationOnMouseDownForY + (mouseY - mouseYOnMouseDown) * 0.05;	
 	}	
@@ -205,13 +213,12 @@ init();
 	function removeEventListeners(){
 		document.removeEventListener('mousemove', onDocumentMouseMove, false);
 		document.removeEventListener('mouseup', onDocumentMouseUp, false);
-		document.removeEventListener('mouseout', onDocumentMouseOut, false);	
+		document.removeEventListener('mouseout', onDocumentMouseOut, false);		
 	}
 	/****** MOUSE EVENTS END **********/
 	
 	/****** TOUCH EVENETS START *******/
 	function onDocumentTouchStart( event ) {
-	
 		document.addEventListener('touchmove', onDocumentTouchMove, false);
 		document.addEventListener('touchleave', onDocumentTouchLeave, false);
 		document.addEventListener('touchend', onDocumentTouchEnd, false);
@@ -263,12 +270,15 @@ init();
 
 	//Others methods
 	function setZ(){
-	deviceWidth= $(window).width();
-		if (deviceWidth < 470)
-			camera.position.z = 800;
-		else
-			camera.position.z = 500;
-	
+		deviceWidth= $(window).width();
+		deviceHeight = $(window).height();
+		
+		//console.log("device width:"+deviceWidth+" device height:"+deviceHeight);
+		
+			if (deviceWidth < 470)
+				camera.position.z = 800;
+			else
+				camera.position.z = 500;
 	}
 	
 	// CODE SCRAPS
