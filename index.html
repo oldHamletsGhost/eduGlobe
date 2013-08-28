@@ -225,20 +225,17 @@ init();
 			
 			event.preventDefault();
 			alert("triggered "+globe.position.z);
-			if (globe.position.z < 220){globe.position.z += 20;}
-			//alert("triggered "+globe.position.z);
-		
+			if (globe.position.z < 200){globe.position.z += 20;}
 		});
 		
 		$("#atlas").bind("pinchclose", function(event){
+			event.preventDefault();
+			alert("triggered "+globe.position.z);
 			if(globe.position.z > -510){globe.position.z -= 20;}
-		
-		
 		});
 		
 		document.addEventListener('touchmove', onDocumentTouchMove, false);
-		
-		
+
 		if ( event.touches.length == 1 ){	
 			event.preventDefault();
 			mouseXOnMouseDown = event.touches[ 0 ].pageX - windowHalfX;
@@ -276,9 +273,7 @@ init();
 	function setZ(){
 		deviceWidth= $(window).width();
 		deviceHeight = $(window).height();
-		
-		//console.log("device width:"+deviceWidth+" device height:"+deviceHeight);
-		
+	
 			if (deviceWidth < 470)
 				camera.position.z = 800;
 			else
