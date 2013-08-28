@@ -6,7 +6,7 @@
 <meta name="description" content="3D globe created using three.js"/>
 <meta name="author" content="Greg Goldsberry"/>
 <meta name="references" content="Mr. Droob & Team, creators of three.js"/>
-<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+<meta name="viewport" content="width=device-width, user-scalable=0"/>
 
 <!-- <meta name="viewpoint" content="width=device-width, height=device-height, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"/> -->
 
@@ -16,20 +16,26 @@
 <script src="jquery1.8.3.min.js" type="text/javascript"></script>
 <script src="jgestures.js" type="text/javascript"></script>
 <script src="three.js" type="text/javascript"></script>
-<script src="hammer.js" type="text/javascript"></script>
-<script src="hammer.fakemultitouch.js" type="text/javascript"></script>
+<!-- <script src="hammer.js" type="text/javascript"></script>
+<script src="hammer.fakemultitouch.js" type="text/javascript"></script>-->
 
 <style>
 	body{ 
-		background-image:url(starField.jpg);
+	/*	background-image:url(starField.jpg);
 		background-position: center;
 		background-size: cover;
 		-webkit-background-size: cover;
         -moz-background-size: cover;
         -o-background-size: cover;
-		background-repeat: no-repeat;	
-	}
+		background-repeat: no-repeat;	*/
 		
+		background-color: black;
+		width: inherit;
+	}
+
+	#atlas canvas{
+		width: 100%;
+	}
 </style>
 </head>
 <body>
@@ -58,8 +64,8 @@ init();
 
 	function init(){
 
-		x = $(window).width();
-		y = $(window).height();
+		//x = $(window).width();
+		//y = $(window).height();
 		
 		//console.log("Device height: "+y+", Device width: "+x);
 		//console.log("scrollHeight: "+document.body.scrollHeight+" scrollWidth: "+document.body.scrollWidth);
@@ -72,7 +78,7 @@ init();
 		scene = new THREE.Scene();
 		
 		camera = new THREE.PerspectiveCamera(45, window.innerWidth/ window.innerHeight, 1, 1000);
-		
+
 		setZ();
 		scene.add(camera);
 		
@@ -81,7 +87,7 @@ init();
 		
 		loader.load('smallEarth.jpg', function (texture)
 		{
-			var geometry = new THREE.SphereGeometry(radius, 40, 40);
+			var geometry = new THREE.SphereGeometry(radius, 20, 20);
 			var material = new THREE.MeshLambertMaterial({
 				map: texture,
 				overdraw: true
@@ -94,8 +100,7 @@ init();
 		});
 		
 		scene.add(globe);
-		
-		
+
 		// LIGHT
 		/*
 		light = new THREE.PointLight(0xffffff);
@@ -114,15 +119,6 @@ init();
 		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
 		window.addEventListener('resize', onWindowResize, false );
 		
-		var canvas = document.getElementsByTagName('canvas')[0];
-		
-		here = $("#atlas").width();
-		
-		console.log("THIS ONE: "+here);
-		
-		canvas.width = $("#atlas").width();
-		//canvas.height = window.innerHeight;
-
 		requestAnimationFrame(render);
 	}	
 	
@@ -137,8 +133,6 @@ init();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		
 		setZ();
-		canvas.width = $("#atlas").width();
-		canvas.height = $("#atlas").height();
 	}
 	
 	function render(){
@@ -206,7 +200,11 @@ init();
 		if (delta == 1){
 			if(globe.position.z > -510){globe.position.z -= 10;}
 		}else{
-			if (globe.position.z < 120){globe.position.z += 10;}
+		//alert(globe.position.z);
+			if (globe.position.z < 120){
+				globe.position.z += 10;
+				console.log(globe.position.z);
+			}
 		}
 	}
 	
@@ -218,12 +216,28 @@ init();
 	/****** MOUSE EVENTS END **********/
 	
 	/****** TOUCH EVENETS START *******/
-	function onDocumentTouchStart( event ) {
-		document.addEventListener('touchmove', onDocumentTouchMove, false);
+	function onDocumentTouchStart(event) {
+		
+		var i = globe.position.z;
 		document.addEventListener('touchleave', onDocumentTouchLeave, false);
 		document.addEventListener('touchend', onDocumentTouchEnd, false);
-		$("#atlas").bind("pinchopen", onPinchOpen);
-		$("#atlas").bind("pinchclose", onPinchClose);
+		$("#atlas").bind("pinchopen", function(event){
+			
+			event.preventDefault();
+			alert("triggered "+globe.position.z);
+			if (globe.position.z < 220){globe.position.z += 20;}
+			//alert("triggered "+globe.position.z);
+		
+		});
+		
+		$("#atlas").bind("pinchclose", function(event){
+			if(globe.position.z > -510){globe.position.z -= 20;}
+		
+		
+		});
+		
+		document.addEventListener('touchmove', onDocumentTouchMove, false);
+		
 		
 		if ( event.touches.length == 1 ){	
 			event.preventDefault();
@@ -255,17 +269,7 @@ init();
 		document.removeEventListener('touchleave', onDocumentTouchLeave, false);
 		document.removeEventListener('touchend', onDocumentTouchEnd, false);
 	}	
-	
-	function onPinchOpen(event){
-		event.preventDefault();
-		if(globe.position.z > -540){globe.position.z -= 1;}
-	}	
-	
-	function onPinchClose(event){
-		event.preventDefault();
-		if (globe.position.z < 330){globe.position.z += 1;}
-	}
-	
+
 	/**** TOUCH EVENTS END *****/
 
 	//Others methods
