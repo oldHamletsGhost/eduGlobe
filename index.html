@@ -14,10 +14,12 @@
 
 <script src="jquery1.7.2.min.js" type="text/javascript"></script>
 <script src="jquery1.8.3.min.js" type="text/javascript"></script>
-<script src="jgestures.js" type="text/javascript"></script>
+<script src="hammer.js" type="text/javascript"></script>
+<script src="hammer.fakemultitouch.js" type="text/javascript"></script>
 <script src="three.js" type="text/javascript"></script>
-<!-- <script src="hammer.js" type="text/javascript"></script>
-<script src="hammer.fakemultitouch.js" type="text/javascript"></script>-->
+<script src="jgestures.js" type="text/javascript"></script>
+
+
 
 <style>
 	body{ 
@@ -118,7 +120,25 @@ init();
 		document.addEventListener('mousewheel', onMouseWheel, false);
 		document.addEventListener('DOMMouseScroll', onMouseWheel, false);
 		window.addEventListener('resize', onWindowResize, false );
+
+		var element = document.getElementById('atlas');
+		//$("#atlas").hammer().on("pinchout", function()
+		var hammertime = Hammer(element).on("pinchout", function(event){
+			globe.position.z += 20;
+			alert("PINCH OUT triggered "+globe.position.z);
+	
+		});
 		
+		var hammertime2 = Hammer(element).on("pinchin", function(event){
+			//event.preventDefault();
+			alert("PINCH IN triggered "+globe.position.z);
+			globe.position.z -= 20;
+			//if(globe.position.z > -510){globe.position.z -= 20;}
+		});
+
+
+
+	
 		requestAnimationFrame(render);
 	}	
 	
@@ -217,23 +237,10 @@ init();
 	
 	/****** TOUCH EVENETS START *******/
 	function onDocumentTouchStart(event) {
-		
+		event.preventDefault();
 		var i = globe.position.z;
 		document.addEventListener('touchleave', onDocumentTouchLeave, false);
 		document.addEventListener('touchend', onDocumentTouchEnd, false);
-		$("#atlas").bind("pinchopen", function(event){
-			
-			event.preventDefault();
-			alert("triggered "+globe.position.z);
-			if (globe.position.z < 200){globe.position.z += 20;}
-		});
-		
-		$("#atlas").bind("pinchclose", function(event){
-			event.preventDefault();
-			alert("triggered "+globe.position.z);
-			if(globe.position.z > -510){globe.position.z -= 20;}
-		});
-		
 		document.addEventListener('touchmove', onDocumentTouchMove, false);
 
 		if ( event.touches.length == 1 ){	
