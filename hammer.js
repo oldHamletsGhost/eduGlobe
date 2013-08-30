@@ -2,7 +2,8 @@
  * http://eightmedia.github.com/hammer.js
  *
  * Copyright (c) 2013 Jorik Tangelder <j.tangelder@gmail.com>;
- * Licensed under the MIT license */
+ * Licensed under the MIT license 
+ */
 
 (function(window, undefined) {
     'use strict';

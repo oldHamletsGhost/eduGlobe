@@ -3,7 +3,7 @@
      * enable multitouch on the desktop by pressing the shiftkey
      * the other touch goes in the opposite direction so the center keeps at its place
      * it's recommended to enable Hammer.debug.showTouches for this one
-     */
+     **/
     Hammer.plugins.fakeMultitouch = function() {
         // keeps the start position to keep it centered
         var start_pos = false;

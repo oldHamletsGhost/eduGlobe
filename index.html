@@ -89,7 +89,7 @@ init();
 		
 		loader.load('smallEarth.jpg', function (texture)
 		{
-			var geometry = new THREE.SphereGeometry(radius, 20, 20);
+			var geometry = new THREE.SphereGeometry(radius, 45, 20);
 			var material = new THREE.MeshLambertMaterial({
 				map: texture,
 				overdraw: true
@@ -122,23 +122,20 @@ init();
 		window.addEventListener('resize', onWindowResize, false );
 
 		var element = document.getElementById('atlas');
-		//$("#atlas").hammer().on("pinchout", function()
 		var hammertime = Hammer(element).on("pinchout", function(event){
+			//removeEventListener('touchstart', onDocumentTouchStart, false);
 			globe.position.z += 20;
-			alert("PINCH OUT triggered "+globe.position.z);
-	
+			//alert("PINCH OUT triggered "+globe.position.z);
+			//document.addEventListener('touchstart', onDocumentTouchStart, false);
 		});
 		
 		var hammertime2 = Hammer(element).on("pinchin", function(event){
-			//event.preventDefault();
-			alert("PINCH IN triggered "+globe.position.z);
+			//removeEventListener('touchstart', onDocumentTouchStart, false);
 			globe.position.z -= 20;
 			//if(globe.position.z > -510){globe.position.z -= 20;}
+			//document.addEventListener('touchstart', onDocumentTouchStart, false);
 		});
-
-
-
-	
+		
 		requestAnimationFrame(render);
 	}	
 	
@@ -155,8 +152,7 @@ init();
 		setZ();
 	}
 	
-	function render(){
-			
+	function render(){	
 		requestAnimationFrame(render);
 	/*	if (rotate == true){
 			//globe.rotation.x += 0.01;
@@ -218,13 +214,15 @@ init();
 		var delta = Math.max(-1, Math.min(1, (event.wheelDelta || e.detail)));
 		
 		if (delta == 1){
-			if(globe.position.z > -510){globe.position.z -= 10;}
+			//if(globe.position.z > -510){
+			globe.position.z -= 10;
+			//}
 		}else{
 		//alert(globe.position.z);
-			if (globe.position.z < 120){
+			//if (globe.position.z < 120){
 				globe.position.z += 10;
 				console.log(globe.position.z);
-			}
+			//}
 		}
 	}
 	
