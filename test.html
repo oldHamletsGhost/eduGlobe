@@ -18,13 +18,33 @@
 <script src="hammer.fakemultitouch.js" type="text/javascript"></script>
 <script src="three.js" type="text/javascript"></script>
 <script src="jgestures.js" type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="styles">
-</head>
 
+
+
+<style>
+	body{ 
+	/*	background-image:url(starField.jpg);
+		background-position: center;
+		background-size: cover;
+		-webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+		background-repeat: no-repeat;	*/
+		
+		background-color: black;
+		width: inherit;
+	}
+
+	#atlas canvas{
+		width: 100%;
+	}
+</style>
+</head>
 <body>
-	<div id="atlas">
-		<label for="gpscoords"></label>
-	</div>
+	<div id="atlas"></div>
+</body>
+
+
 <script>
 
 var atlas, camera, scene, renderer, light;
@@ -43,7 +63,6 @@ var mouseXOnMouseDown = 0, mouseYOnMouseDown = 0;
 var radius = 150;
 var deviceWidth;
 var deviceHeight;
-var rotate = true;
 
 init();
 
@@ -66,25 +85,45 @@ init();
 
 		setZ();
 		scene.add(camera);
-
-		var geometry = new THREE.SphereGeometry(150,100,100);
-		var material = new THREE.MeshPhongMaterial();
 		
-		material.map = THREE.ImageUtils.loadTexture("smallEarth.jpg");
+		globe = new THREE.Object3D();
+		//var loader = new THREE.TextureLoader();
 		
-		material.bumpMap = THREE.ImageUtils.loadTexture("earthBump.jpg");
-		material.bumpScale = 5;
-
-		globe = new THREE.Mesh(geometry, material);
+		//loader.load('smallEarth.jpg', function (texture)
+		//{
+			var geometry = new THREE.SphereGeometry(radius, 45, 20);
+			var texture = THREE.ImageUtils.loadTexture('smallEarth.jpg');
+			
+			
+		//	var material = new THREE.MeshLambertMaterial({
+			//	map: texture,
+				//overdraw: true
+				//wireframe: true
+		//	});
+		
+		
+		//new THREE.MeshLambertMaterial({map: texture,overdraw: true});
+		
+		
+		
+			var mesh = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({map: texture,overdraw: true}));
+			
+			mesh.doubleSided=true;
+			globe.add(mesh);
+			//globe.add(addOthers(globe));		
+	//	});
+		
 		scene.add(globe);
 
 		// LIGHT
-		var directionalLight = new THREE.DirectionalLight( 0xffffff, 1.0 );
-		directionalLight.position.set( 1, 1, 1 );
-		scene.add( directionalLight );
-	
-		//TODO?: Detect browser - create webGL for browsers who can support it; use canvas as fallback
-		renderer = new THREE.WebGLRenderer();
+		/*
+		light = new THREE.PointLight(0xffffff);
+		light.position.set(0,0,0);
+		scene.add(light);
+		*/
+		
+		//TODO: Detect browser - create webGL for browsers who can support it; use canvas as fallback
+		renderer = new THREE.CanvasRenderer();
 		renderer.setSize(window.innerWidth, window.innerHeight);
 		atlas.appendChild(renderer.domElement);
 
@@ -110,8 +149,7 @@ init();
 		});
 		
 		requestAnimationFrame(render);
-	}
-
+	}	
 	
 	function onWindowResize(){
 
@@ -128,21 +166,20 @@ init();
 	
 	function render(){	
 		requestAnimationFrame(render);
-		if (rotate){
-			//globe.rotation.y += 0.01;
-		}else{ 
+	/*	if (rotate == true){
+			//globe.rotation.x += 0.01;
+		}else{ */
 			globe.rotation.x += (targetRotationForY - globe.rotation.x) *0.05;
 			globe.rotation.y += (targetRotationForX - globe.rotation.y) *0.05;
-		}
+	//	}
 		renderer.render(scene, camera);
 	}		
 	
 	/***** MOUSE EVENTS START******/	
 	function onDocumentMouseDown(event){
-		
-		rotate = false;
+
 		event.preventDefault();
-		var coord = new THREE.Vector3(0,0,0);
+		
 		mouse.x = (event.clientX/window.innerWidth) * 2 - 1;
 		mouse.y = -(event.clientY/window.innerHeight) * 2 + 1;
 
@@ -150,13 +187,13 @@ init();
 		projector.unprojectVector(vector, camera);
 		
 		var raycaster = new THREE.Raycaster( camera.position, vector.sub(camera.position).normalize() );
-		//var intersects = raycaster.intersectObjects(scene.getDescendants());
-		var intersects = raycaster.intersectObject(globe);
-		
+		var intersects = raycaster.intersectObjects(scene.getDescendants());
+
 		//DETECTS IF THE SPHERE IS TOUCHED
 		if (intersects.length > 0) {
-			//alert("sphere touched");	
-		}else{	
+			//alert("sphere touched");		
+		}else{
+			
 			//alert("space touched");
 		}	
 
@@ -166,19 +203,12 @@ init();
 
 		mouseXOnMouseDown = event.clientX - windowHalfX;
 		mouseYOnMouseDown = event.clientY - windowHalfY;
-		//coordinate retrieval
-		/*	var lat = getLatitude(event.clientX, event.clientY);
-		var lon = getLongitude(event.clientX, event.clientY);
-		*/
-		//var lblCoords = document.getElementById("gpscoords").innerHtml =("LAT = " + lat + " & LON = " + lon);
-		
+
 		targetRotationOnMouseDownForX = targetRotationForX;
 		targetRotationOnMouseDownForY = targetRotationForY;
-	/*	alert("LAT = " + lat + " & LON = " + lon);*/
 	}
 	
 	function onDocumentMouseMove(e){
-		rotate = false;
 		mouseX =  e.clientX - windowHalfX;
 		mouseY =  e.clientY - windowHalfY;	
 		
@@ -186,20 +216,7 @@ init();
 		targetRotationForY = targetRotationOnMouseDownForY + (mouseY - mouseYOnMouseDown) * 0.05;	
 	}	
 	
-	function onDocumentMouseUp(){
-		mouseXOnMouseDown = event.clientX - windowHalfX;
-			mouseYOnMouseDown = event.clientY - windowHalfY;
-			//coordinate retrieval
-			var lat = getLatitude(event.clientX, event.clientY);
-			var lon = getLongitude(event.clientX, event.clientY);
-		
-		alert("LAT = " + lat + " & LON = " + lon);
-		removeEventListeners();
-		rotate= true;
-	}
-	
-	
-	
+	function onDocumentMouseUp(){removeEventListeners();}
 	function onDocumentMouseOut(){removeEventListeners();}
 	
 	function onMouseWheel(event){
@@ -227,44 +244,6 @@ init();
 		document.removeEventListener('mouseout', onDocumentMouseOut, false);		
 	}
 	/****** MOUSE EVENTS END **********/
-	
-	/******* COORDINATE FUNCTIONS BEGIN ******/
-	//LATITUDE
-	function getLatitude(x,y){
-		var coord = getXYZ(x,y);							
-		//var latitude = radianToDegrees(Math.atan2(coord.y, Math.sqrt(Math.pow(coord.x,2) + Math.pow(coord.z, 2))));
-		var latitude = radianToDegrees(90 - (Math.acos(coord.y / radius)));
-		return latitude;
-	}
-	
-	//LONGITUDE		
-	function getLongitude(x,y){
-		var coord = getXYZ(x,y);	
-		var longitude = 270 + radianToDegrees(Math.atan2(coord.x, coord.z)) + globe.rotation.y;
-		return longitude;
-	}
-	
-	//HELPER METHOD FOR LATITUDE AND LONGITUDE
-	function getXYZ (x,y){
-		var coord = new THREE.Vector3(0,0,0);
-		
-		coord.x = x - windowHalfX;
-		coord.y = y - windowHalfY;
-		
-		coord.x *= (radius/window.innerWidth);
-		coord.y *= (radius/window.innerHeight);
-		coord.z = -(Math.sqrt(1 - (Math.pow(coord.x, 2) - Math.pow(coord.y,2))));	
-		
-		return coord;	
-	}
-	
-	//CONVERTS RADIANS TO DEGREES
-	function radianToDegrees(radian){	
-		return (radian * 180.0/Math.PI);		
-	}
-	
-	/******** COORDINATE FUNCTIONS END ********/
-	
 	
 	/****** TOUCH EVENETS START *******/
 	function onDocumentTouchStart(event) {
@@ -307,7 +286,7 @@ init();
 
 	/**** TOUCH EVENTS END *****/
 
-	//Other methods
+	//Others methods
 	function setZ(){
 		deviceWidth= $(window).width();
 		deviceHeight = $(window).height();
@@ -363,5 +342,4 @@ init();
 	*/
 </script>
 </body>
-
 </html>

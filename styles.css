@@ -1,1 +1,22 @@
-body{ background-image:url(star_field.jpg);}
+body{ 
+		background-image:url(starField.jpg);
+		background-position: center;
+		background-size: cover;
+		-webkit-background-size: cover;
+        -moz-background-size: cover;
+        -o-background-size: cover;
+		background-repeat: no-repeat;	
+		
+		background-color: black;
+		width: inherit;
+	}
+
+	#atlas canvas{
+		width: 100%;
+	}
+	
+	label{
+		top:0px;
+		left:0px;
+		background-color:white;
+	}
