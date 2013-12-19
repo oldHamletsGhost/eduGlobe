@@ -187,13 +187,7 @@ init();
 	}	
 	
 	function onDocumentMouseUp(){
-		mouseXOnMouseDown = event.clientX - windowHalfX;
-			mouseYOnMouseDown = event.clientY - windowHalfY;
-			//coordinate retrieval
-			var lat = getLatitude(event.clientX, event.clientY);
-			var lon = getLongitude(event.clientX, event.clientY);
-		
-		alert("LAT = " + lat + " & LON = " + lon);
+		alertCoords();
 		removeEventListeners();
 		rotate= true;
 	}
@@ -229,6 +223,19 @@ init();
 	/****** MOUSE EVENTS END **********/
 	
 	/******* COORDINATE FUNCTIONS BEGIN ******/
+
+	//Shows coordinates
+	function alertCoords(){
+		mouseXOnMouseDown = event.clientX - windowHalfX;
+		mouseYOnMouseDown = event.clientY - windowHalfY;
+	
+		//coordinate retrieval
+		var lat = getLatitude(event.clientX, event.clientY);
+		var lon = getLongitude(event.clientX, event.clientY);
+		
+		alert("LAT = " + lat + "\nLON = " + lon);
+	}
+
 	//LATITUDE
 	function getLatitude(x,y){
 		var coord = getXYZ(x,y);							
